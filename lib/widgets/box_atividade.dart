@@ -66,9 +66,8 @@ class boxAtividade extends StatelessWidget {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => Temporizador(
-                                    atividade: atividade,
-                                  )));
+                              builder: (context) =>
+                                  Temporizador(nome: atividade.nome)));
                     },
                     style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.zero,

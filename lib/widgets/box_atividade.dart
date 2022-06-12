@@ -67,7 +67,7 @@ class boxAtividade extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  Temporizador(nome: atividade.nome)));
+                                  Temporizador(atividade: atividade)));
                     },
                     style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.zero,
@@ -86,9 +86,8 @@ class boxAtividade extends StatelessWidget {
                         height: 50,
                         alignment: Alignment.center,
                         child: const Text(
-                          // todo - adicionar view temporizador
                           'Praticar',
-                          style: const TextStyle(fontSize: 20),
+                          style: TextStyle(fontSize: 20),
                         ),
                       ),
                     ),

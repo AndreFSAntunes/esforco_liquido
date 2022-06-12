@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/atividade.dart';
-import '../providers/list_atividade.dart';
+import '../providers/AtividadeSessaoProvider.dart';
 import '../widgets/box_atividade.dart';
 
 class HomeView extends StatefulWidget {
@@ -27,12 +27,13 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     Atividade newAtv;
-    Provider.of<ListaAtividade>(context, listen: false).listAtividade = atvList;
+    Provider.of<SessaoAtividadeProvider>(context, listen: false).listAtividade =
+        atvList;
     return Scaffold(
       appBar: AppBar(
         title: const Text(''),
       ),
-      body: Consumer<ListaAtividade>(
+      body: Consumer<SessaoAtividadeProvider>(
         builder: (context, listaAtividades, child) => Center(
           child: (atvList?.isEmpty ?? true)
               ? const Center(child: Text('Adicione uma atividade'))
@@ -144,10 +145,10 @@ class _HomeViewState extends State<HomeView> {
       });
 
   _criarAtividade(BuildContext context, String? nome, Color cor) {
-    print(nome);
-    print(cor);
-    Atividade newAtv = Atividade(nome: nome, cor: cor);
-    Provider.of<ListaAtividade>(context, listen: false).addNew(newAtv);
+    Atividade newAtv = Atividade(nome, cor);
+    //debugPrint(newAtv.toString());
+    Provider.of<SessaoAtividadeProvider>(context, listen: false)
+        .adicionaAtividade(newAtv);
     _saveAtvs();
     Navigator.pop(context);
   }
@@ -155,9 +156,12 @@ class _HomeViewState extends State<HomeView> {
   //TODO mudar para o provider ListaAtividade
   _saveAtvs() async {
     storedData = await SharedPreferences.getInstance();
-    atvList = Provider.of<ListaAtividade>(context, listen: false).listAtividade;
+    atvList = Provider.of<SessaoAtividadeProvider>(context, listen: false)
+        .listAtividade;
+    //print(atvList);
     List<String> strAtvList =
         atvList == null ? [] : atvList!.map((atv) => atv.toJson()).toList();
+    //print('string $strAtvList');
     await storedData.setStringList('listaAtividades', strAtvList);
   }
 
@@ -167,7 +171,7 @@ class _HomeViewState extends State<HomeView> {
     atvList = decoded == null
         ? []
         : decoded.map((item) => Atividade.fromJson(item)).toList();
-    print('from SP $atvList');
+    //print('from SP $atvList');
     setState(() {});
   }
 }

@@ -1,16 +1,24 @@
+import 'package:esforco_liquido/models/atividade.dart';
+import 'package:esforco_liquido/models/sessao.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
+import '../providers/AtividadeSessaoProvider.dart';
+import 'atividade_view.dart';
+
 class Temporizador extends StatefulWidget {
-  String? nome;
+  Atividade atividade;
 
-  Temporizador({this.nome, Key? key}) : super(key: key);
+  Temporizador({required this.atividade, Key? key}) : super(key: key);
 
-  static Future<void> navigatorPush(BuildContext context, String nome) async {
+  static Future<void> navigatorPush(
+      BuildContext context, Atividade atividade) async {
     return Navigator.push<void>(
       context,
       MaterialPageRoute(
-        builder: (_) => Temporizador(nome: nome),
+        builder: (_) => Temporizador(atividade: atividade),
       ),
     );
   }
@@ -21,6 +29,9 @@ class Temporizador extends StatefulWidget {
 
 class _State extends State<Temporizador> {
   final _isHours = true;
+  bool _isPlaying = true;
+  var tempoInicial;
+  List<Sessao>? sssList = [];
 
   final StopWatchTimer _stopWatchTimer = StopWatchTimer(
     mode: StopWatchMode.countUp,
@@ -40,6 +51,7 @@ class _State extends State<Temporizador> {
   @override
   void initState() {
     super.initState();
+    _autoStart();
   }
 
   @override
@@ -52,7 +64,9 @@ class _State extends State<Temporizador> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Center(widthFactor: 8, child: Text(widget.nome.toString())),
+        //automaticallyImplyLeading: false,
+        title: Center(
+            widthFactor: 8, child: Text(widget.atividade.nome.toString())),
       ),
       body: Center(
         child: Scrollbar(
@@ -96,47 +110,65 @@ class _State extends State<Temporizador> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
+                    !_isPlaying
+                        ? Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                _stopWatchTimer.onExecute
+                                    .add(StopWatchExecute.start);
+                                setState(() {
+                                  _isPlaying = true;
+                                });
+                              },
+                              child: const Text(
+                                'Continuar',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          )
+                        : Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                _stopWatchTimer.onExecute
+                                    .add(StopWatchExecute.stop);
+                                setState(() {
+                                  _isPlaying = false;
+                                });
+                              },
+                              child: const Text(
+                                'Pausar',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: RaisedButton(
-                        padding: const EdgeInsets.all(4),
-                        color: Colors.lightBlue,
-                        shape: const StadiumBorder(),
+                      child: ElevatedButton(
                         onPressed: () async {
-                          _stopWatchTimer.onExecute.add(StopWatchExecute.start);
-                        },
-                        child: const Text(
-                          'Start',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: RaisedButton(
-                        padding: const EdgeInsets.all(4),
-                        color: Colors.green,
-                        shape: const StadiumBorder(),
-                        onPressed: () async {
-                          _stopWatchTimer.onExecute.add(StopWatchExecute.stop);
-                        },
-                        child: const Text(
-                          'Stop',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: RaisedButton(
-                        padding: const EdgeInsets.all(4),
-                        color: Colors.red,
-                        shape: const StadiumBorder(),
-                        onPressed: () async {
+                          var tempoFinal = DateTime.now();
+                          int totalSeconds =
+                              tempoFinal.difference(tempoInicial).inSeconds;
+                          var time1 = _stopWatchTimer.rawTime.value;
+                          int seconds = time1 ~/ 1000;
+                          int tempoPausa = totalSeconds - seconds;
+
                           _stopWatchTimer.onExecute.add(StopWatchExecute.reset);
+                          Sessao novaSessao = Sessao(
+                              id: widget.atividade.id!,
+                              tempoAtivo: seconds,
+                              tempoPausa: tempoPausa,
+                              inicio: tempoInicial);
+                          print(novaSessao);
+                          Provider.of<SessaoAtividadeProvider>(context,
+                                  listen: false)
+                              .adicionaSessao(novaSessao);
+                          _saveSessoes();
+                          _goToAtividadeView(context, widget.atividade);
                         },
                         child: const Text(
-                          'Reset',
+                          'Finalizar',
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
@@ -149,5 +181,31 @@ class _State extends State<Temporizador> {
         ),
       ),
     );
+  }
+
+  void _autoStart() {
+    _stopWatchTimer.onExecute.add(StopWatchExecute.start);
+    tempoInicial = DateTime.now();
+  }
+
+  _goToAtividadeView(BuildContext context, Atividade atividade) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+          builder: (context) => AtividadeView(
+                atividade: atividade,
+              )),
+    );
+  }
+
+  _saveSessoes() async {
+    SharedPreferences storedData = await SharedPreferences.getInstance();
+    sssList =
+        Provider.of<SessaoAtividadeProvider>(context, listen: false).listSessao;
+    //print(sssList);
+    List<String> strAtvList =
+        sssList == null ? [] : sssList!.map((atv) => atv.toJson()).toList();
+    //print('string $strAtvList');
+    await storedData.setStringList('listaSessoes', strAtvList);
   }
 }

@@ -31,7 +31,8 @@ class _HomeViewState extends State<HomeView> {
         atvList;
     return Scaffold(
       appBar: AppBar(
-        title: const Text(''),
+        centerTitle: true,
+        title: const Text('Projeto Integrador'),
       ),
       body: Consumer<SessaoAtividadeProvider>(
         builder: (context, listaAtividades, child) => Center(

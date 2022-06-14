@@ -55,20 +55,53 @@ class _AtividadeViewState extends State<AtividadeView> {
       body: Center(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text('id: $idStr'),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.all(8.0),
+            //   child: Text('id: $idStr'),
+            // ),
             Consumer<SessaoAtividadeProvider>(
               builder: (context, listaSessoes, child) => Center(
-                child: (sssList?.isEmpty ?? true)
-                    ? const Center(child: Text('nenhuma sessao'))
+                child: (sssList
+                            ?.where(
+                                (element) => element.id == widget.atividade.id)
+                            .isEmpty ??
+                        true)
+                    ? const Center(
+                        child: Padding(
+                        padding: EdgeInsets.only(top: 50),
+                        child: Text('nenhuma sessao'),
+                      ))
                     : ListView.builder(
+                        reverse: true,
                         shrinkWrap: true,
-                        itemCount: sssList?.length,
+                        itemCount: sssList
+                            ?.where(
+                                (element) => element.id == widget.atividade.id)
+                            .length,
                         itemBuilder: (context, index) {
-                          return ListTile(
-                            title: Text(sssList![index].toString()),
+                          String tempoTotal =
+                              sssList![index].tempoAtivo.toString();
+                          String dataSessao =
+                              _formatarData(sssList![index].inicio);
+
+                          return Column(
+                            children: [
+                              ListTile(
+                                leading: Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 15,
+                                  ),
+                                  child: Text(
+                                    '$tempoTotal seg',
+                                    textAlign: TextAlign.end,
+                                  ),
+                                ),
+                                title: Center(child: Text(dataSessao)),
+                                trailing: IconButton(
+                                    onPressed: () {}, icon: Icon(Icons.edit)),
+                              ),
+                              Divider(thickness: 2),
+                            ],
                           );
                         }),
               ),
@@ -109,5 +142,12 @@ class _AtividadeViewState extends State<AtividadeView> {
         : decoded.map((item) => Sessao.fromJson(item)).toList();
     //print('from SP $sssList');
     setState(() {});
+  }
+
+  String _formatarData(DateTime inicio) {
+    String dia = inicio.day.toString();
+    String mes = inicio.month.toString();
+    String ano = inicio.year.toString();
+    return '$dia\/$mes\/$ano';
   }
 }

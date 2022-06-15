@@ -146,27 +146,7 @@ class _State extends State<Temporizador> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: ElevatedButton(
-                        onPressed: () async {
-                          var tempoFinal = DateTime.now();
-                          int totalSeconds =
-                              tempoFinal.difference(tempoInicial).inSeconds;
-                          var time1 = _stopWatchTimer.rawTime.value;
-                          int seconds = time1 ~/ 1000;
-                          int tempoPausa = totalSeconds - seconds;
-
-                          _stopWatchTimer.onExecute.add(StopWatchExecute.reset);
-                          Sessao novaSessao = Sessao(
-                              id: widget.atividade.id!,
-                              tempoAtivo: seconds,
-                              tempoPausa: tempoPausa,
-                              inicio: tempoInicial);
-                          print(novaSessao);
-                          Provider.of<SessaoAtividadeProvider>(context,
-                                  listen: false)
-                              .adicionaSessao(novaSessao);
-                          _saveSessoes();
-                          _goToAtividadeView(context, widget.atividade);
-                        },
+                        onPressed: () => _criaSessao(context),
                         child: const Text(
                           'Finalizar',
                           style: TextStyle(color: Colors.white),
@@ -181,6 +161,26 @@ class _State extends State<Temporizador> {
         ),
       ),
     );
+  }
+
+  void _criaSessao(BuildContext context) async {
+    var tempoFinal = DateTime.now();
+    int totalSeconds = tempoFinal.difference(tempoInicial).inSeconds;
+    var time1 = _stopWatchTimer.rawTime.value;
+    int seconds = time1 ~/ 1000;
+    int tempoPausa = totalSeconds - seconds;
+
+    _stopWatchTimer.onExecute.add(StopWatchExecute.reset);
+    Sessao novaSessao = Sessao(
+        id: widget.atividade.id!,
+        tempoAtivo: seconds,
+        tempoPausa: tempoPausa,
+        inicio: tempoInicial);
+    print(novaSessao);
+    Provider.of<SessaoAtividadeProvider>(context, listen: false)
+        .adicionaSessao(novaSessao);
+    _saveSessoes(widget.atividade.id.toString());
+    _goToAtividadeView(context, widget.atividade);
   }
 
   void _autoStart() {
@@ -198,7 +198,7 @@ class _State extends State<Temporizador> {
     );
   }
 
-  _saveSessoes() async {
+  _saveSessoes(String id) async {
     SharedPreferences storedData = await SharedPreferences.getInstance();
     sssList =
         Provider.of<SessaoAtividadeProvider>(context, listen: false).listSessao;
@@ -206,6 +206,6 @@ class _State extends State<Temporizador> {
     List<String> strAtvList =
         sssList == null ? [] : sssList!.map((atv) => atv.toJson()).toList();
     //print('string $strAtvList');
-    await storedData.setStringList('listaSessoes', strAtvList);
+    await storedData.setStringList(id, strAtvList);
   }
 }

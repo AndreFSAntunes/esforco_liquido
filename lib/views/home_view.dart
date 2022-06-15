@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
@@ -62,8 +64,21 @@ class _HomeViewState extends State<HomeView> {
         double test = MediaQuery.of(context).size.width * 0.4 - 120;
         final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
         String? nomeAtv = '';
-        Color cor = Colors.red;
-
+        List<Color> colorList = [
+          Colors.red,
+          Colors.purple,
+          Colors.deepPurple,
+          Colors.indigo,
+          Colors.blue,
+          Colors.teal,
+          Colors.green,
+          Colors.yellow,
+          Colors.amber,
+          Colors.deepOrange,
+          Colors.grey,
+          Colors.blueGrey,
+        ];
+        Color cor = colorList[Random().nextInt(colorList.length)];
         return Dialog(
           elevation: 10,
           insetPadding: EdgeInsets.symmetric(horizontal: test),
@@ -97,21 +112,8 @@ class _HomeViewState extends State<HomeView> {
                     height: 220,
                     width: 250,
                     child: BlockPicker(
-                      availableColors: [
-                        Colors.red,
-                        Colors.purple,
-                        Colors.deepPurple,
-                        Colors.indigo,
-                        Colors.blue,
-                        Colors.teal,
-                        Colors.green,
-                        Colors.yellow,
-                        Colors.amber,
-                        Colors.deepOrange,
-                        Colors.grey,
-                        Colors.blueGrey,
-                      ],
-                      pickerColor: Colors.red, //default color
+                      availableColors: colorList,
+                      pickerColor: cor, //default color
                       onColorChanged: (Color color) {
                         cor = color;
                       },

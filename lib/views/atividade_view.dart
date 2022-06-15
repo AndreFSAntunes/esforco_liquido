@@ -56,62 +56,69 @@ class _AtividadeViewState extends State<AtividadeView> {
                 ],
               ),
               body: Center(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Temporizador(
-                                      atividade: widget.atividade)));
-                        },
-                        style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30))),
-                        child: Ink(
-                          decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xff374ABE), Color(0xff64B6FF)],
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    //physics: BouncingScrollPhysics(),
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Temporizador(
+                                        atividade: widget.atividade)));
+                          },
+                          style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30))),
+                          child: Ink(
+                            decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xff374ABE),
+                                    Color(0xff64B6FF)
+                                  ],
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                ),
+                                borderRadius: BorderRadius.circular(30)),
+                            child: Container(
+                              width: 120,
+                              height: 50,
+                              alignment: Alignment.center,
+                              child: const Text(
+                                'Praticar',
+                                style: TextStyle(fontSize: 20),
                               ),
-                              borderRadius: BorderRadius.circular(30)),
-                          child: Container(
-                            width: 120,
-                            height: 50,
-                            alignment: Alignment.center,
-                            child: const Text(
-                              'Praticar',
-                              style: TextStyle(fontSize: 20),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    Consumer<SessaoAtividadeProvider>(
-                      builder: (context, listaSessoes, child) => Center(
-                          child: (sssList
-                                      ?.where((element) =>
-                                          element.id == widget.atividade.id)
-                                      .isEmpty ??
-                                  true)
-                              ? const Center(
-                                  child: Padding(
-                                  padding: EdgeInsets.only(top: 50),
-                                  child: Text('nenhuma sessao'),
-                                ))
-                              : DataTable(
-                                  sortAscending: false,
-                                  sortColumnIndex: 2,
-                                  columns: getColumns(columns),
-                                  rows: getRows(sssList!.reversed.toList()),
-                                )),
-                    ),
-                  ],
+                      Consumer<SessaoAtividadeProvider>(
+                        builder: (context, listaSessoes, child) => Center(
+                            child: (sssList
+                                        ?.where((element) =>
+                                            element.id == widget.atividade.id)
+                                        .isEmpty ??
+                                    true)
+                                ? const Center(
+                                    child: Padding(
+                                    padding: EdgeInsets.only(top: 50),
+                                    child: Text('nenhuma sessao'),
+                                  ))
+                                : DataTable(
+                                    sortAscending: false,
+                                    sortColumnIndex: 2,
+                                    columns: getColumns(columns),
+                                    rows: getRows(sssList!.reversed.toList()),
+                                  )),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ));

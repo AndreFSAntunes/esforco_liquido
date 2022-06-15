@@ -64,9 +64,8 @@ class _State extends State<Temporizador> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        //automaticallyImplyLeading: false,
-        title: Center(
-            widthFactor: 8, child: Text(widget.atividade.nome.toString())),
+        automaticallyImplyLeading: false,
+        title: Center(child: Text(widget.atividade.nome.toString())),
       ),
       body: Center(
         child: Scrollbar(

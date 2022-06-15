@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/sessao.dart';
 import '../providers/AtividadeSessaoProvider.dart';
+import 'temporizador_view.dart';
 
 class AtividadeView extends StatefulWidget {
   final Atividade atividade;
@@ -41,52 +42,79 @@ class _AtividadeViewState extends State<AtividadeView> {
     Provider.of<SessaoAtividadeProvider>(context, listen: false).listSessao =
         sssList;
     final columns = ['Prática', 'Pausa', 'Data'];
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: widget.atividade.cor,
-        // titleSpacing: 0,
-        // leading: ElevatedButton.icon(
-        //     onPressed: _gotoHome(context),
-        //     icon: const Icon(Icons.home),
-        //     label: const Text('home')),
-        title: Text(widget.atividade.nome.toString()),
-        centerTitle: true,
-        actions: [
-          IconButton(
-              onPressed: () => editaAtividadeDialog(context, widget.atividade),
-              icon: const Icon(Icons.edit))
-        ],
-      ),
-      body: Center(
-        child: Column(
-          children: [
-            // Padding(
-            //   padding: const EdgeInsets.all(8.0),
-            //   child: Text('id: $idStr'),
-            // ),
-            Consumer<SessaoAtividadeProvider>(
-              builder: (context, listaSessoes, child) => Center(
-                  child: (sssList
-                              ?.where((element) =>
-                                  element.id == widget.atividade.id)
-                              .isEmpty ??
-                          true)
-                      ? const Center(
-                          child: Padding(
-                          padding: EdgeInsets.only(top: 50),
-                          child: Text('nenhuma sessao'),
-                        ))
-                      : DataTable(
-                          sortAscending: false,
-                          sortColumnIndex: 2,
-                          columns: getColumns(columns),
-                          rows: getRows(sssList!.reversed.toList()),
-                        )),
-            ),
-          ],
-        ),
-      ),
-    );
+    return Consumer<SessaoAtividadeProvider>(
+        builder: (context, listaAtividades, child) => Scaffold(
+              appBar: AppBar(
+                backgroundColor: widget.atividade.cor,
+                title: Text(widget.atividade.nome.toString()),
+                centerTitle: true,
+                actions: [
+                  IconButton(
+                      onPressed: () =>
+                          {editaAtividadeDialog(context, widget.atividade)},
+                      icon: const Icon(Icons.edit))
+                ],
+              ),
+              body: Center(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Temporizador(
+                                      atividade: widget.atividade)));
+                        },
+                        style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30))),
+                        child: Ink(
+                          decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xff374ABE), Color(0xff64B6FF)],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
+                              borderRadius: BorderRadius.circular(30)),
+                          child: Container(
+                            width: 120,
+                            height: 50,
+                            alignment: Alignment.center,
+                            child: const Text(
+                              'Praticar',
+                              style: TextStyle(fontSize: 20),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Consumer<SessaoAtividadeProvider>(
+                      builder: (context, listaSessoes, child) => Center(
+                          child: (sssList
+                                      ?.where((element) =>
+                                          element.id == widget.atividade.id)
+                                      .isEmpty ??
+                                  true)
+                              ? const Center(
+                                  child: Padding(
+                                  padding: EdgeInsets.only(top: 50),
+                                  child: Text('nenhuma sessao'),
+                                ))
+                              : DataTable(
+                                  sortAscending: false,
+                                  sortColumnIndex: 2,
+                                  columns: getColumns(columns),
+                                  rows: getRows(sssList!.reversed.toList()),
+                                )),
+                    ),
+                  ],
+                ),
+              ),
+            ));
   }
 
   // void _Cronologico(int coluna, bool crescente) {
@@ -265,7 +293,8 @@ editaAtividadeDialog(BuildContext context, Atividade atividade) => showDialog(
                     ),
                     ElevatedButton(
                       child: const Text('Excluir'),
-                      onPressed: () => _Delete(context, atividade),
+                      onPressed: () =>
+                          deletaAtividadeDialog(context, atividade),
                     ),
                   ],
                 ),
@@ -289,7 +318,14 @@ _Delete(BuildContext context, Atividade atividade) {
   Provider.of<SessaoAtividadeProvider>(context, listen: false)
       .excluirAtividade(atividade);
   _saveAtvs(context);
-  Navigator.pop(context, true);
+  // TODO escluir sessoes
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(
+      builder: (BuildContext context) => const HomeView(),
+    ),
+    (route) => false,
+  );
 }
 
 _saveAtvs(BuildContext context) async {
@@ -303,3 +339,37 @@ _saveAtvs(BuildContext context) async {
   //print('string $strAtvList');
   await storedData.setStringList('listaAtividades', strAtvList);
 }
+
+deletaAtividadeDialog(BuildContext context, Atividade atividade) => showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (BuildContext context) {
+      return Dialog(
+          elevation: 10,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 10),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(11),
+          ),
+          child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Confirma exclusão?'),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  ElevatedButton(
+                    child: const Text('Sim'),
+                    onPressed: () => _Delete(context, atividade),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  ElevatedButton(
+                    child: const Text('Não'),
+                    onPressed: () => Navigator.pop(context),
+                  )
+                ],
+              )));
+    });

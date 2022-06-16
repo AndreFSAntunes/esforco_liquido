@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:esforco_liquido/views/info_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
@@ -35,6 +36,21 @@ class _HomeViewState extends State<HomeView> {
       appBar: AppBar(
         centerTitle: true,
         title: const Text('Projeto Integrador'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 15),
+            child: IconButton(
+              onPressed: () => {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => InfoView()),
+                )
+              },
+              icon: const Icon(Icons.info),
+              //padding: EdgeInsets.only(right: 20),
+            ),
+          )
+        ],
       ),
       body: Consumer<SessaoAtividadeProvider>(
         builder: (context, listaAtividades, child) => Center(

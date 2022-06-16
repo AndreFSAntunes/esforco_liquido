@@ -1,5 +1,6 @@
 import 'package:esforco_liquido/models/atividade.dart';
 import 'package:esforco_liquido/models/sessao.dart';
+import 'package:esforco_liquido/widgets/botao_gradiente.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -62,101 +63,119 @@ class _State extends State<Temporizador> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Center(child: Text(widget.atividade.nome.toString())),
-      ),
-      body: Center(
-        child: Scrollbar(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                /// Display stop watch time
-                StreamBuilder<int>(
-                  stream: _stopWatchTimer.rawTime,
-                  initialData: _stopWatchTimer.rawTime.value,
-                  builder: (context, snap) {
-                    final value = snap.data!;
-                    final displayTime = StopWatchTimer.getDisplayTime(
-                      value,
-                      hours: _isHours,
-                      milliSecond: false,
-                    );
-                    return Column(
+    return SafeArea(
+      child: Scaffold(
+        // appBar: AppBar(
+        //   backgroundColor: widget.atividade.cor,
+        //   automaticallyImplyLeading: false,
+        //   title: Center(child: Text(widget.atividade.nome.toString())),
+        // ),
+        body: Column(
+          children: [
+            const SizedBox(
+              height: 15,
+            ),
+            Container(
+              padding: EdgeInsets.all(25),
+              width: (MediaQuery.of(context).size.width - 30),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: widget.atividade.cor,
+              ),
+              child: Text(
+                  softWrap: true,
+                  widget.atividade.nome.toString(),
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 50.0,
+                      fontWeight: FontWeight.w700)),
+            ),
+            Expanded(
+              child: Center(
+                child: Scrollbar(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Text(
-                            displayTime,
-                            style: const TextStyle(
-                                fontSize: 40,
-                                fontFamily: 'Helvetica',
-                                fontWeight: FontWeight.bold),
-                          ),
+                        /// Display stop watch time
+                        StreamBuilder<int>(
+                          stream: _stopWatchTimer.rawTime,
+                          initialData: _stopWatchTimer.rawTime.value,
+                          builder: (context, snap) {
+                            final value = snap.data!;
+                            final displayTime = StopWatchTimer.getDisplayTime(
+                              value,
+                              hours: _isHours,
+                              milliSecond: false,
+                            );
+                            return Column(
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.all(8),
+                                  child: Text(
+                                    displayTime,
+                                    style: const TextStyle(
+                                        fontSize: 40,
+                                        fontFamily: 'Helvetica',
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+
+                        /// Button
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            !_isPlaying
+                                ? GradientButton(
+                                    title: 'Continuar',
+                                    onPressed: () async {
+                                      _stopWatchTimer.onExecute
+                                          .add(StopWatchExecute.start);
+                                      setState(() {
+                                        _isPlaying = true;
+                                      });
+                                    },
+                                    listCor: [
+                                        Color(0xff0b134f),
+                                        Color(0xff3444ba)
+                                      ])
+                                : GradientButton(
+                                    title: 'Pausar',
+                                    onPressed: () async {
+                                      _stopWatchTimer.onExecute
+                                          .add(StopWatchExecute.stop);
+                                      setState(() {
+                                        _isPlaying = false;
+                                      });
+                                    },
+                                    listCor: [
+                                        Color(0xff246e1b),
+                                        Color(0xff78c46e)
+                                      ]),
+                            GradientButton(
+                                title: 'Finalizar',
+                                onPressed: () => _criaSessao(context),
+                                listCor: [
+                                  Color(0xff7a1010),
+                                  Color(0xffc73a3a)
+                                ]),
+                          ],
                         ),
                       ],
-                    );
-                  },
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-
-                /// Button
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    !_isPlaying
-                        ? Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                _stopWatchTimer.onExecute
-                                    .add(StopWatchExecute.start);
-                                setState(() {
-                                  _isPlaying = true;
-                                });
-                              },
-                              child: const Text(
-                                'Continuar',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          )
-                        : Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                _stopWatchTimer.onExecute
-                                    .add(StopWatchExecute.stop);
-                                setState(() {
-                                  _isPlaying = false;
-                                });
-                              },
-                              child: const Text(
-                                'Pausar',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: ElevatedButton(
-                        onPressed: () => _criaSessao(context),
-                        child: const Text(
-                          'Finalizar',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
                     ),
-                  ],
+                  ),
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -171,14 +190,13 @@ class _State extends State<Temporizador> {
 
     _stopWatchTimer.onExecute.add(StopWatchExecute.reset);
     Sessao novaSessao = Sessao(
-        id: widget.atividade.id!,
+        idAtv: widget.atividade.idAtv!,
         tempoAtivo: seconds,
         tempoPausa: tempoPausa,
         inicio: tempoInicial);
-    print(novaSessao);
     Provider.of<SessaoAtividadeProvider>(context, listen: false)
-        .adicionaSessao(novaSessao);
-    _saveSessoes(widget.atividade.id.toString());
+        .adicionaSessao(novaSessao, widget.atividade);
+    _saveSessoes(widget.atividade.idAtv.toString());
     _goToAtividadeView(context, widget.atividade);
   }
 
@@ -188,7 +206,7 @@ class _State extends State<Temporizador> {
   }
 
   _goToAtividadeView(BuildContext context, Atividade atividade) {
-    Navigator.pushReplacement(
+    Navigator.push(
       context,
       MaterialPageRoute(
           builder: (context) => AtividadeView(
@@ -201,10 +219,13 @@ class _State extends State<Temporizador> {
     SharedPreferences storedData = await SharedPreferences.getInstance();
     sssList =
         Provider.of<SessaoAtividadeProvider>(context, listen: false).listSessao;
-    //print(sssList);
+    // int total =
+    //     Provider.of<SessaoAtividadeProvider>(context, listen: false).total;
     List<String> strAtvList =
         sssList == null ? [] : sssList!.map((atv) => atv.toJson()).toList();
     //print('string $strAtvList');
+    //String intId = id + "1";
     await storedData.setStringList(id, strAtvList);
+    // await storedData.setInt(intId, total);
   }
 }

@@ -167,6 +167,13 @@ class _State extends State<Temporizador> {
                                   Color(0xff7a1010),
                                   Color(0xffc73a3a)
                                 ]),
+                            // ElevatedButton.icon(
+                            //     // remover botão de teste
+                            //     onPressed: () {
+                            //       print(widget.atividade.toString());
+                            //     },
+                            //     icon: Icon(Icons.golf_course),
+                            //     label: Text('teste')),
                           ],
                         ),
                       ],
@@ -206,7 +213,7 @@ class _State extends State<Temporizador> {
   }
 
   _goToAtividadeView(BuildContext context, Atividade atividade) {
-    Navigator.push(
+    Navigator.pushReplacement(
       context,
       MaterialPageRoute(
           builder: (context) => AtividadeView(
@@ -226,6 +233,19 @@ class _State extends State<Temporizador> {
     //print('string $strAtvList');
     //String intId = id + "1";
     await storedData.setStringList(id, strAtvList);
+    await _saveAtvs();
     // await storedData.setInt(intId, total);
+  }
+
+  _saveAtvs() async {
+    SharedPreferences storedData = await SharedPreferences.getInstance();
+    List<Atividade>? atvList =
+        Provider.of<SessaoAtividadeProvider>(context, listen: false)
+            .listAtividade;
+    //print(atvList);
+    List<String> strAtvList =
+        atvList == null ? [] : atvList.map((atv) => atv.toJson()).toList();
+    //print('string $strAtvList');
+    await storedData.setStringList('listaAtividades', strAtvList);
   }
 }

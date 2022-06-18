@@ -1,17 +1,24 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:math';
 
-import 'package:esforco_liquido/views/info_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:esforco_liquido/views/info_view.dart';
 
 import '../models/atividade.dart';
 import '../providers/AtividadeSessaoProvider.dart';
 import '../widgets/box_atividade.dart';
 
 class HomeView extends StatefulWidget {
-  const HomeView({Key? key}) : super(key: key);
+  bool reload;
+
+  HomeView({
+    Key? key,
+    required this.reload,
+  }) : super(key: key);
 
   @override
   State<HomeView> createState() => _HomeViewState();
@@ -24,14 +31,18 @@ class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
-    _getAtvs();
+    _getAtvs(widget.reload);
   }
 
   @override
   Widget build(BuildContext context) {
     Atividade newAtv;
-    Provider.of<SessaoAtividadeProvider>(context, listen: false).listAtividade =
-        atvList;
+    if (widget.reload) {
+      Provider.of<SessaoAtividadeProvider>(context, listen: false)
+          .listAtividade = atvList;
+    }
+    atvList = Provider.of<SessaoAtividadeProvider>(context, listen: false)
+        .listAtividade;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -184,13 +195,15 @@ class _HomeViewState extends State<HomeView> {
     await storedData.setStringList('listaAtividades', strAtvList);
   }
 
-  void _getAtvs() async {
-    SharedPreferences storedData = await SharedPreferences.getInstance();
-    List<String>? decoded = storedData.getStringList('listaAtividades');
-    atvList = decoded == null
-        ? []
-        : decoded.map((item) => Atividade.fromJson(item)).toList();
-    //print('from SP $atvList');
-    setState(() {});
+  void _getAtvs(reload) async {
+    if (reload) {
+      SharedPreferences storedData = await SharedPreferences.getInstance();
+      List<String>? decoded = storedData.getStringList('listaAtividades');
+      atvList = decoded == null
+          ? []
+          : decoded.map((item) => Atividade.fromJson(item)).toList();
+      //print('from SP $atvList');
+      setState(() {});
+    }
   }
 }

@@ -35,7 +35,7 @@ class _AtividadeViewState extends State<AtividadeView> {
   void initState() {
     super.initState();
     _getSessoes(widget.atividade.idAtv.toString());
-    print(totalInt.toString());
+    //print(totalInt.toString());
   }
 
   @override
@@ -50,19 +50,21 @@ class _AtividadeViewState extends State<AtividadeView> {
         builder: (context, listaAtividades, child) => Scaffold(
               appBar: AppBar(
                 leading: IconButton(
-                  icon: Icon(Icons.arrow_back),
+                  icon: const Icon(Icons.arrow_back),
                   onPressed: () {
                     Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => HomeView(),
+                        builder: (context) => HomeView(reload: false),
                       ),
                       (route) => false,
                     );
                   },
                 ),
                 backgroundColor: widget.atividade.cor,
-                title: Text(widget.atividade.nome.toString()),
+                title: Text(
+                  widget.atividade.nome.toString(),
+                ),
                 centerTitle: true,
                 actions: [
                   IconButton(
@@ -80,10 +82,21 @@ class _AtividadeViewState extends State<AtividadeView> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                            'Total: ${_formataHm(widget.atividade.totalPratica!)}'),
-                        GradientPraticar(
-                            atividade: widget.atividade,
-                            listCor: [Color(0xff374ABE), Color(0xff64B6FF)]),
+                          'Total: ${_formataHm(widget.atividade.totalPratica!)}',
+                          style: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w600),
+                        ),
+                        GradientPraticar(atividade: widget.atividade, listCor: [
+                          const Color(0xff374ABE),
+                          const Color(0xff64B6FF)
+                        ]),
+                        // ElevatedButton.icon(
+                        //     // remover botão de teste
+                        //     onPressed: () {
+                        //       print(widget.atividade.toString());
+                        //     },
+                        //     icon: Icon(Icons.golf_course),
+                        //     label: Text('teste')),
                       ],
                     ),
                     Consumer<SessaoAtividadeProvider>(
@@ -169,7 +182,7 @@ class _AtividadeViewState extends State<AtividadeView> {
   void _getSessoes(String id) async {
     SharedPreferences storedData = await SharedPreferences.getInstance();
     List<String>? decoded = storedData.getStringList(id);
-    String intId = id + "1"; // TODO impelmentar melhor
+    String intId = id + "1";
     totalInt = storedData.getInt(intId) ?? 0;
     sssList = decoded == null
         ? []
@@ -335,7 +348,7 @@ _Delete(BuildContext context, Atividade atividade) {
   Navigator.pushAndRemoveUntil(
     context,
     MaterialPageRoute(
-      builder: (BuildContext context) => const HomeView(),
+      builder: (BuildContext context) => HomeView(reload: false),
     ),
     (route) => false,
   );

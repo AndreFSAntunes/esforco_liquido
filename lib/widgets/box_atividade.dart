@@ -75,6 +75,13 @@ class boxAtividade extends StatelessWidget {
                               fontSize: 13.0,
                               fontWeight: FontWeight.w500),
                         ),
+                        // ElevatedButton.icon(
+                        //     // remover botão de teste
+                        //     onPressed: () {
+                        //       print(atividade.toString());
+                        //     },
+                        //     icon: Icon(Icons.golf_course),
+                        //     label: Text('teste')),
                       ],
                     ),
                   ),

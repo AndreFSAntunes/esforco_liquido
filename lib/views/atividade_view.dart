@@ -44,97 +44,99 @@ class _AtividadeViewState extends State<AtividadeView> {
     String idStr = widget.atividade.idAtv.toString();
     Provider.of<SessaoAtividadeProvider>(context, listen: false).listSessao =
         sssList;
-    final columns = ['Prática', 'Intervalo', 'Data'];
+    final columns = ['Prática', 'Data'];
 
     return Consumer<SessaoAtividadeProvider>(
-        builder: (context, listaAtividades, child) => Scaffold(
-              appBar: AppBar(
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () {
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => HomeView(reload: false),
-                      ),
-                      (route) => false,
-                    );
-                  },
-                ),
-                backgroundColor: widget.atividade.cor,
-                title: Text(
-                  widget.atividade.nome.toString(),
-                ),
-                centerTitle: true,
-                actions: [
-                  IconButton(
-                      onPressed: () =>
-                          {editaAtividadeDialog(context, widget.atividade)},
-                      icon: const Icon(Icons.edit))
-                ],
-              ),
-              body: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Column(
-                  //physics: BouncingScrollPhysics(),
+      builder: (context, listaAtividades, child) => WillPopScope(
+        onWillPop: () => _confirmaSaida(context),
+        child: Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HomeView(reload: false),
+                  ),
+                  (route) => false,
+                );
+              },
+            ),
+            backgroundColor: widget.atividade.cor,
+            title: Text(
+              widget.atividade.nome.toString(),
+            ),
+            centerTitle: true,
+            actions: [
+              IconButton(
+                  onPressed: () =>
+                      {editaAtividadeDialog(context, widget.atividade)},
+                  icon: const Icon(Icons.edit))
+            ],
+          ),
+          body: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              //physics: BouncingScrollPhysics(),
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Total: ${_formataHm(widget.atividade.totalPratica!)}',
-                          style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w600),
-                        ),
-                        GradientPraticar(atividade: widget.atividade, listCor: [
-                          const Color(0xff374ABE),
-                          const Color(0xff64B6FF)
-                        ]),
-                        // ElevatedButton.icon(
-                        //     // remover botão de teste
-                        //     onPressed: () {
-                        //       print(widget.atividade.toString());
-                        //     },
-                        //     icon: Icon(Icons.golf_course),
-                        //     label: Text('teste')),
+                    Text(
+                      'Total: ${_formataHm(widget.atividade.totalPratica!)}',
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                    GradientPraticar(
+                      atividade: widget.atividade,
+                      listCor: [
+                        const Color(0xff374ABE),
+                        const Color(0xff64B6FF)
                       ],
                     ),
-                    Consumer<SessaoAtividadeProvider>(
-                      builder: (context, listaSessoes, child) => Center(
-                          child: (sssList?.isEmpty ?? true)
-                              ? const Center(
-                                  child: Padding(
-                                  padding: EdgeInsets.only(top: 50),
-                                  child: Text('nenhuma sessao'),
-                                ))
-                              : DataTable(
-                                  sortAscending: false,
-                                  sortColumnIndex: 2,
-                                  columns: getColumns(columns),
-                                  rows: getRows(sssList!
-                                      .where((element) =>
-                                          element.idAtv ==
-                                          widget.atividade.idAtv)
-                                      .toList()
-                                      .reversed
-                                      .toList()),
-                                )),
-                    ),
+                    // ElevatedButton.icon(
+                    //     // remover botão de teste
+                    //     onPressed: () {
+                    //       print(widget.atividade.toString());
+                    //     },
+                    //     icon: Icon(Icons.golf_course),
+                    //     label: Text('teste')),
                   ],
                 ),
-              ),
-            ));
+                Consumer<SessaoAtividadeProvider>(
+                  builder: (context, listaSessoes, child) => Center(
+                      child: (sssList?.isEmpty ?? true)
+                          ? const Center(
+                              child: Padding(
+                              padding: EdgeInsets.only(top: 50),
+                              child: Text('nenhuma sessao'),
+                            ))
+                          : DataTable(
+                              sortAscending: false,
+                              sortColumnIndex: 1,
+                              columns: getColumns(columns),
+                              rows: getRows(sssList!
+                                  .where((element) =>
+                                      element.idAtv == widget.atividade.idAtv)
+                                  .toList()
+                                  .reversed
+                                  .toList()),
+                            )),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
-  // void _Cronologico(int coluna, bool crescente) {
-  //   if (coluna == 2) {
-  //     sssList!.sort((sss1, sss2) => sss2.inicio.compareTo(sss1.inicio));
-  //   }
-  //   setState(() {
-  //     this.coluna = coluna;
-  //     this.crescente = crescente;
-  //   });
-  // }
+  Future<bool> _confirmaSaida(BuildContext context) async {
+    //TODO voltar para home por enquanto esta bloqueando
+    bool? confirma;
+    return confirma ?? false;
+  }
 
   List<DataColumn> getColumns(List<String> columns) => columns
       .map((String column) => DataColumn(
@@ -146,7 +148,6 @@ class _AtividadeViewState extends State<AtividadeView> {
   List<DataRow> getRows(List<Sessao> sessao) => sessao.map((Sessao sessao) {
         final cells = [
           Text(_formataHHmmss(sessao.tempoAtivo)),
-          Text(_formataHHmmss(sessao.tempoPausa)),
           Text(_formatarData(sessao.inicio)),
         ];
 

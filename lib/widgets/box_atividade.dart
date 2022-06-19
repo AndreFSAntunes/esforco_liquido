@@ -87,10 +87,10 @@ class boxAtividade extends StatelessWidget {
                   ),
                 ),
                 //botao_estudar(),
-                GradientPraticar(atividade: atividade, listCor: [
-                  const Color(0xff374ABE),
-                  const Color(0xff64B6FF)
-                ]),
+                GradientPraticar(
+                  atividade: atividade,
+                  listCor: [const Color(0xff374ABE), const Color(0xff64B6FF)],
+                ),
               ],
             ),
           ),

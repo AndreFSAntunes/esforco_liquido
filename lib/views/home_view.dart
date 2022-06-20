@@ -25,7 +25,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  List<Atividade>? atvList = [];
+  List<Atividade> atvList = [];
   late SharedPreferences storedData;
 
   @override
@@ -67,13 +67,13 @@ class _HomeViewState extends State<HomeView> {
         ),
         body: Consumer<SessaoAtividadeProvider>(
           builder: (context, listaAtividades, child) => Center(
-            child: (atvList?.isEmpty ?? true)
+            child: (atvList.isEmpty)
                 ? const Center(child: Text('Adicione uma atividade'))
                 : ListView.builder(
-                    itemCount: atvList?.length,
+                    itemCount: atvList.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: boxAtividade(atvList![index]),
+                        title: boxAtividade(atvList[index]),
                       );
                     }),
           ),
@@ -196,7 +196,7 @@ class _HomeViewState extends State<HomeView> {
         .listAtividade;
     //print(atvList);
     List<String> strAtvList =
-        atvList == null ? [] : atvList!.map((atv) => atv.toJson()).toList();
+        atvList == null ? [] : atvList.map((atv) => atv.toJson()).toList();
     //print('string $strAtvList');
     await storedData.setStringList('listaAtividades', strAtvList);
   }

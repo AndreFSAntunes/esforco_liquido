@@ -42,7 +42,7 @@ class _HomeViewState extends State<HomeView> {
           .listAtividade = atvList;
     }
     atvList = Provider.of<SessaoAtividadeProvider>(context, listen: false)
-        .listAtividade;
+        .listAtividade!;
     return WillPopScope(
       onWillPop: () => _confirmaSaida(context),
       child: Scaffold(
@@ -193,7 +193,7 @@ class _HomeViewState extends State<HomeView> {
   _saveAtvs() async {
     storedData = await SharedPreferences.getInstance();
     atvList = Provider.of<SessaoAtividadeProvider>(context, listen: false)
-        .listAtividade;
+        .listAtividade!;
     //print(atvList);
     List<String> strAtvList =
         atvList == null ? [] : atvList.map((atv) => atv.toJson()).toList();

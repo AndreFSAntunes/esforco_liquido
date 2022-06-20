@@ -1,20 +1,43 @@
-//TODO
-
-import 'package:esforco_liquido/models/atividade.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/atividade.dart';
 import '../models/sessao.dart';
 
 class SessaoAtividadeProvider with ChangeNotifier {
-  List<Sessao> listSessao = [];
-  List<Atividade> listAtividade = [];
+  List<Atividade>? listAtividade = [];
+  List<Sessao>? listSessao = [];
 
-  void editaAtividade(Atividade atividade, String? nome, Color cor) {}
+  void adicionaAtividade(nova) {
+    listAtividade?.add(nova);
+    notifyListeners();
+  }
 
-  void excluirAtividade(Atividade atividade) {}
+  Future<void> excluirAtividade(atv) async {
+    SharedPreferences data = await SharedPreferences.getInstance();
+    data.remove(atv.idAtv.toString());
+    listAtividade?.remove(atv);
+    notifyListeners();
+  }
 
-  void adicionaAtividade(Atividade atividade) {}
+  void adicionaSessao(Sessao nova, Atividade atividade) {
+    atividade.SomaPratica(nova.tempoAtivo);
+    listSessao?.add(nova);
+    notifyListeners();
+  }
 
-  void adicionaSessao(Sessao novaSessao, Atividade atividade) {}
+  void excluirSessao(sessao, Atividade atividade) {
+    // total = total == null
+    //     ? (sessao.tempoAtivo as int)
+    //     : total - (sessao.tempoAtivo as int);
+    atividade.SubtraiPratica(sessao.tempoAtivo);
+    listSessao?.remove(sessao);
+    notifyListeners();
+  }
+
+  void editaAtividade(Atividade atividade, String? nome, Color cor) {
+    atividade.nome = nome;
+    atividade.cor = cor;
+    notifyListeners();
+  }
 }

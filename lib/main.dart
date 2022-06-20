@@ -20,7 +20,7 @@ class EsforcoLiquidoApp extends StatelessWidget {
         primarySwatch: Colors.red,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: HomeView(),
+      home: HomeView(reload: true),
     );
   }
 }

@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -5,12 +6,19 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:esforco_liquido/views/info_view.dart';
+
 import '../models/atividade.dart';
 import '../providers/AtividadeSessaoProvider.dart';
 import '../widgets/box_atividade.dart';
 
 class HomeView extends StatefulWidget {
-  const HomeView({Key? key}) : super(key: key);
+  bool reload;
+
+  HomeView({
+    Key? key,
+    required this.reload,
+  }) : super(key: key);
 
   @override
   State<HomeView> createState() => _HomeViewState();
@@ -23,36 +31,61 @@ class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
-    _getAtvs();
+    _getAtvs(widget.reload);
   }
 
   @override
   Widget build(BuildContext context) {
     Atividade newAtv;
-    Provider.of<SessaoAtividadeProvider>(context, listen: false).listAtividade =
-        atvList;
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Text('Projeto Integrador'),
-      ),
-      body: Consumer<SessaoAtividadeProvider>(
-        builder: (context, listaAtividades, child) => Center(
-          child: (atvList?.isEmpty ?? true)
-              ? const Center(child: Text('Adicione uma atividade'))
-              : ListView.builder(
-                  itemCount: atvList?.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: boxAtividade(atvList![index]),
-                    );
-                  }),
+    if (widget.reload) {
+      Provider.of<SessaoAtividadeProvider>(context, listen: false)
+          .listAtividade = atvList;
+    }
+    atvList = Provider.of<SessaoAtividadeProvider>(context, listen: false)
+        .listAtividade;
+    return WillPopScope(
+      onWillPop: () => _confirmaSaida(context),
+      child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: const Text('Projeto Integrador'),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 15),
+              child: IconButton(
+                onPressed: () => {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => InfoView()),
+                  )
+                },
+                icon: const Icon(Icons.info),
+                //padding: EdgeInsets.only(right: 20),
+              ),
+            )
+          ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => criarAtividadeDialog(context),
-        tooltip: 'Adicionar Atividade',
-        child: const Icon(Icons.add),
+        body: Consumer<SessaoAtividadeProvider>(
+          builder: (context, listaAtividades, child) => Center(
+            child: (atvList?.isEmpty ?? true)
+                ? const Center(child: Text('Adicione uma atividade'))
+                : ListView.builder(
+                    itemCount: atvList?.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: boxAtividade(atvList![index]),
+                      );
+                    }),
+          ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.miniStartTop,
+        floatingActionButton: FloatingActionButton(
+          mini: true,
+          backgroundColor: Colors.red.shade200,
+          onPressed: () => criarAtividadeDialog(context),
+          tooltip: 'Adicionar Atividade',
+          child: const Icon(Icons.add, size: 35),
+        ),
       ),
     );
   }
@@ -168,13 +201,45 @@ class _HomeViewState extends State<HomeView> {
     await storedData.setStringList('listaAtividades', strAtvList);
   }
 
-  void _getAtvs() async {
-    SharedPreferences storedData = await SharedPreferences.getInstance();
-    List<String>? decoded = storedData.getStringList('listaAtividades');
-    atvList = decoded == null
-        ? []
-        : decoded.map((item) => Atividade.fromJson(item)).toList();
-    //print('from SP $atvList');
-    setState(() {});
+  void _getAtvs(reload) async {
+    if (reload) {
+      SharedPreferences storedData = await SharedPreferences.getInstance();
+      List<String>? decoded = storedData.getStringList('listaAtividades');
+      atvList = decoded == null
+          ? []
+          : decoded.map((item) => Atividade.fromJson(item)).toList();
+      //print('from SP $atvList');
+      setState(() {});
+    }
+  }
+
+  Future<bool> _confirmaSaida(BuildContext context) async {
+    bool? confirma = await showDialog(
+        context: context, builder: (context) => _janelaConfirmacao(context));
+    return confirma ?? false;
+  }
+
+  // Future<bool?> _showExitDialog(BuildContext context) async {
+  //   return await showDialog(
+  //     context: context,
+  //     builder: (context) => _janelaConfirmacao(context),
+  //   );
+  // }
+
+  AlertDialog _janelaConfirmacao(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Confirmação'),
+      content: const Text('Deseja fechar o aplicativo?'),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text('Não'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: Text('Sim'),
+        ),
+      ],
+    );
   }
 }

@@ -6,26 +6,36 @@ import 'package:flutter/material.dart';
 class Atividade {
   String? nome;
   Color? cor;
-  int? id;
-  // Todo - ID da atividade
+  int? idAtv;
+  int? totalPratica;
 
-  Atividade(this.nome, this.cor, {int? id}) {
+  Atividade(this.nome, this.cor, {int? id, int? totalPratica}) {
     this.nome = nome;
     this.cor = cor;
-    this.id = id == null ? UniqueKey().hashCode : id;
+    this.idAtv = id ?? UniqueKey().hashCode;
+    this.totalPratica = totalPratica ?? 0;
+  }
+
+  void SomaPratica(int segundos) {
+    totalPratica = (totalPratica! + segundos);
+  }
+
+  void SubtraiPratica(int segundos) {
+    totalPratica = (totalPratica! - segundos);
   }
 
   @override
   String toString() {
-    String idStr = id.toString();
-    return "Atividade: $nome\nCor: $cor\n ID: $idStr";
+    String idStr = idAtv.toString();
+    return "Atividade: $nome\nTempo Pracita: ${totalPratica.toString()}\nCor: $cor\n ID: $idStr";
   }
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'nome': nome,
       'cor': cor?.value,
-      'id': id,
+      'idAtv': idAtv,
+      'totalPratica': totalPratica,
     };
   }
 
@@ -33,7 +43,9 @@ class Atividade {
     return Atividade(
       map['nome'] != null ? map['nome'] as String : null,
       map['cor'] != null ? Color(map['cor'] as int) : null,
-      id: map['id'] != null ? map['id'] as int : null,
+      id: map['idAtv'] != null ? map['idAtv'] as int : null,
+      totalPratica:
+          map['totalPratica'] != null ? map['totalPratica'] as int : null,
     );
   }
 

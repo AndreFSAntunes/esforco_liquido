@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../models/atividade.dart';
 import '../views/atividade_view.dart';
+import 'botao_gradiente.dart';
 
 class boxAtividade extends StatelessWidget {
   Atividade atividade;
@@ -45,53 +46,50 @@ class boxAtividade extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(
-                      left: 20.0, right: 5.0, top: 33.0, bottom: 33.0),
+                      left: 20.0, right: 5.0, top: 18.0, bottom: 18.0),
                   //texto do objeto Materia
                   child: Container(
-                    width: box_width - 200,
-                    child: Text(
-                      atividade.nome.toString(),
-                      style: const TextStyle(
-                          color: Colors.black87,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w700),
+                    padding: EdgeInsets.all(10),
+                    //width: box_width - 220,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white70,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          atividade.nome.toString(),
+                          style: const TextStyle(
+                              color: Colors.black87,
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.w700),
+                        ),
+                        const SizedBox(
+                          height: 4,
+                        ),
+                        Text(
+                          "Total: ${_formataHm(atividade.totalPratica!)}",
+                          style: const TextStyle(
+                              color: Colors.black87,
+                              fontSize: 13.0,
+                              fontWeight: FontWeight.w500),
+                        ),
+                        // ElevatedButton.icon(
+                        //     // remover botão de teste
+                        //     onPressed: () {
+                        //       print(atividade.toString());
+                        //     },
+                        //     icon: Icon(Icons.golf_course),
+                        //     label: Text('teste')),
+                      ],
                     ),
                   ),
                 ),
                 //botao_estudar(),
-                Padding(
-                  padding: const EdgeInsets.only(right: 20),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  Temporizador(atividade: atividade)));
-                    },
-                    style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30))),
-                    child: Ink(
-                      decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xff374ABE), Color(0xff64B6FF)],
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                          ),
-                          borderRadius: BorderRadius.circular(30)),
-                      child: Container(
-                        width: 120,
-                        height: 50,
-                        alignment: Alignment.center,
-                        child: const Text(
-                          'Praticar',
-                          style: TextStyle(fontSize: 20),
-                        ),
-                      ),
-                    ),
-                  ),
+                GradientPraticar(
+                  atividade: atividade,
+                  listCor: [const Color(0xff374ABE), const Color(0xff64B6FF)],
                 ),
               ],
             ),
@@ -99,6 +97,15 @@ class boxAtividade extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  _formataHm(int segundos) {
+    Duration duration = Duration(seconds: segundos);
+    String Minutes = duration.inMinutes.remainder(60).toString();
+    if (duration.inHours == 0) {
+      return "${Minutes}m";
+    }
+    return "${duration.inHours}h ${Minutes}m";
   }
 
   _goToAtividadeView(BuildContext context, Atividade atividade) {

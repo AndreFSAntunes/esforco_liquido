@@ -26,7 +26,7 @@ class AtividadeView extends StatefulWidget {
 
 class _AtividadeViewState extends State<AtividadeView> {
   _AtividadeViewState(atividade);
-  List<Sessao>? sssList = [];
+  List<Sessao> sssList = [];
   int coluna = 2;
   bool crescente = false;
   int? totalInt;
@@ -106,7 +106,7 @@ class _AtividadeViewState extends State<AtividadeView> {
                 ),
                 Consumer<SessaoAtividadeProvider>(
                   builder: (context, listaSessoes, child) => Center(
-                      child: (sssList?.isEmpty ?? true)
+                      child: (sssList.isEmpty)
                           ? const Center(
                               child: Padding(
                               padding: EdgeInsets.only(top: 50),
@@ -116,7 +116,7 @@ class _AtividadeViewState extends State<AtividadeView> {
                               sortAscending: false,
                               sortColumnIndex: 1,
                               columns: getColumns(columns),
-                              rows: getRows(sssList!
+                              rows: getRows(sssList
                                   .where((element) =>
                                       element.idAtv == widget.atividade.idAtv)
                                   .toList()

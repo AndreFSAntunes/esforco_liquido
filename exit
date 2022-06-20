@@ -1,0 +1,85 @@
+[33mcommit 62d7499cc467f7ee3f340862671287d5db41188f[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31mesforco_liquido/master[m[33m)[m
+Merge: e138163 f45df20
+Author: Andre <andre.antunes@live.com>
+Date:   Sun Jun 19 21:06:31 2022 -0300
+
+    Merge branch 'master' of https://github.com/AndreFSAntunes/esforco_liquido
+
+[33mcommit e138163710a857d641f0e75c017ddedbb50105fe[m
+Author: Andre <andre.antunes@live.com>
+Date:   Sun Jun 19 21:06:04 2022 -0300
+
+    fix
+
+[33mcommit f45df201719b8e78d63ea5336b025b594bb5e1be[m
+Author: Andre <andre.antunes@live.com>
+Date:   Sun Jun 19 20:18:18 2022 -0300
+
+    UI
+
+[33mcommit a27e9f50ace7422429e145dcdd05a983c3273ecf[m
+Author: Andre <andre.antunes@live.com>
+Date:   Fri Jun 17 21:32:09 2022 -0300
+
+    fix
+
+[33mcommit bb59d582caf8817b40340c444671330fefa1ca40[m
+Author: Andre <andre.antunes@live.com>
+Date:   Thu Jun 16 18:16:10 2022 -0300
+
+    UI
+
+[33mcommit b842ba7af0b6d7a854fa847191d94f43d53bc292[m
+Author: Andre <andre.antunes@live.com>
+Date:   Wed Jun 15 18:10:59 2022 -0300
+
+    UI
+
+[33mcommit 47c452c861447e06ea5a88f389a5eb6bb4b16f0b[m
+Author: Andre <andre.antunes@live.com>
+Date:   Wed Jun 15 16:33:27 2022 -0300
+
+    CRUD atividade e sessoes
+
+[33mcommit 645d36baccd38c04ee5b31ac7a59869aba3e59a9[m
+Merge: 78ac03d 8927c07
+Author: Andre <andre.antunes@live.com>
+Date:   Wed Jun 15 12:56:10 2022 -0300
+
+    Merge branch 'master' of https://github.com/AndreFSAntunes/esforco_liquido
+
+[33mcommit 78ac03df465cc55af8bd9e955d49793f1d7c55cb[m
+Author: Andre <andre.antunes@live.com>
+Date:   Wed Jun 15 12:55:41 2022 -0300
+
+    logos e splash
+
+[33mcommit 8927c072d0cda87b8e7e2b7e90e918ba2c48226e[m
+Author: AndreFSAntunes <60117758+AndreFSAntunes@users.noreply.github.com>
+Date:   Mon Jun 13 21:54:17 2022 -0300
+
+    Update README.md
+
+[33mcommit 315ad8f98cb3a207e15e2cb69e8342f9d43e462d[m
+Author: Andre <andre.antunes@live.com>
+Date:   Mon Jun 13 21:52:09 2022 -0300
+
+    visualização das sessões
+
+[33mcommit 09096d6d9e350a8f12739615a825ede1ca6dafc5[m
+Author: Andre <andre.antunes@live.com>
+Date:   Sun Jun 12 18:51:39 2022 -0300
+
+    sessoes
+
+[33mcommit 8287f8ba4776358d610e317cb95e398f881014cd[m
+Author: Andre <andre.antunes@live.com>
+Date:   Sat Jun 11 18:10:54 2022 -0300
+
+    ui
+
+[33mcommit bb762b18392937ddcaac936aeea963b5cdeffdd4[m
+Author: Andre <andre.antunes@live.com>
+Date:   Wed Jun 8 19:25:13 2022 -0300
+
+    rebuild

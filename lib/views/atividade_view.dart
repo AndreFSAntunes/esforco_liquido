@@ -9,6 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/sessao.dart';
 import '../providers/AtividadeSessaoProvider.dart';
+import '../widgets/botao_gradiente.dart';
+import 'temporizador_view.dart';
 
 class AtividadeView extends StatefulWidget {
   final Atividade atividade;
@@ -27,77 +29,114 @@ class _AtividadeViewState extends State<AtividadeView> {
   List<Sessao>? sssList = [];
   int coluna = 2;
   bool crescente = false;
+  int? totalInt;
 
   @override
   void initState() {
     super.initState();
-    _getSessoes(widget.atividade.id.toString());
+    _getSessoes(widget.atividade.idAtv.toString());
+    //print(totalInt.toString());
   }
 
   @override
   Widget build(BuildContext context) {
     var atividade;
-    String idStr = widget.atividade.id.toString();
+    String idStr = widget.atividade.idAtv.toString();
     Provider.of<SessaoAtividadeProvider>(context, listen: false).listSessao =
         sssList;
-    final columns = ['Prática', 'Pausa', 'Data'];
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: widget.atividade.cor,
-        // titleSpacing: 0,
-        // leading: ElevatedButton.icon(
-        //     onPressed: _gotoHome(context),
-        //     icon: const Icon(Icons.home),
-        //     label: const Text('home')),
-        title: Text(widget.atividade.nome.toString()),
-        centerTitle: true,
-        actions: [
-          IconButton(
-              onPressed: () => editaAtividadeDialog(context, widget.atividade),
-              icon: const Icon(Icons.edit))
-        ],
-      ),
-      body: Center(
-        child: Column(
-          children: [
-            // Padding(
-            //   padding: const EdgeInsets.all(8.0),
-            //   child: Text('id: $idStr'),
-            // ),
-            Consumer<SessaoAtividadeProvider>(
-              builder: (context, listaSessoes, child) => Center(
-                  child: (sssList
-                              ?.where((element) =>
-                                  element.id == widget.atividade.id)
-                              .isEmpty ??
-                          true)
-                      ? const Center(
-                          child: Padding(
-                          padding: EdgeInsets.only(top: 50),
-                          child: Text('nenhuma sessao'),
-                        ))
-                      : DataTable(
-                          sortAscending: false,
-                          sortColumnIndex: 2,
-                          columns: getColumns(columns),
-                          rows: getRows(sssList!.reversed.toList()),
-                        )),
+    final columns = ['Prática', 'Data'];
+
+    return Consumer<SessaoAtividadeProvider>(
+      builder: (context, listaAtividades, child) => WillPopScope(
+        onWillPop: () => _confirmaSaida(context),
+        child: Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HomeView(reload: false),
+                  ),
+                  (route) => false,
+                );
+              },
             ),
-          ],
+            backgroundColor: widget.atividade.cor,
+            title: Text(
+              widget.atividade.nome.toString(),
+            ),
+            centerTitle: true,
+            actions: [
+              IconButton(
+                  onPressed: () =>
+                      {editaAtividadeDialog(context, widget.atividade)},
+                  icon: const Icon(Icons.edit))
+            ],
+          ),
+          body: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              //physics: BouncingScrollPhysics(),
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Total: ${_formataHm(widget.atividade.totalPratica!)}',
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                    GradientPraticar(
+                      atividade: widget.atividade,
+                      listCor: [
+                        const Color(0xff374ABE),
+                        const Color(0xff64B6FF)
+                      ],
+                    ),
+                    // ElevatedButton.icon(
+                    //     // remover botão de teste
+                    //     onPressed: () {
+                    //       print(widget.atividade.toString());
+                    //     },
+                    //     icon: Icon(Icons.golf_course),
+                    //     label: Text('teste')),
+                  ],
+                ),
+                Consumer<SessaoAtividadeProvider>(
+                  builder: (context, listaSessoes, child) => Center(
+                      child: (sssList?.isEmpty ?? true)
+                          ? const Center(
+                              child: Padding(
+                              padding: EdgeInsets.only(top: 50),
+                              child: Text('nenhuma sessao'),
+                            ))
+                          : DataTable(
+                              sortAscending: false,
+                              sortColumnIndex: 1,
+                              columns: getColumns(columns),
+                              rows: getRows(sssList!
+                                  .where((element) =>
+                                      element.idAtv == widget.atividade.idAtv)
+                                  .toList()
+                                  .reversed
+                                  .toList()),
+                            )),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 
-  // void _Cronologico(int coluna, bool crescente) {
-  //   if (coluna == 2) {
-  //     sssList!.sort((sss1, sss2) => sss2.inicio.compareTo(sss1.inicio));
-  //   }
-  //   setState(() {
-  //     this.coluna = coluna;
-  //     this.crescente = crescente;
-  //   });
-  // }
+  Future<bool> _confirmaSaida(BuildContext context) async {
+    //TODO voltar para home por enquanto esta bloqueando
+    bool? confirma;
+    return confirma ?? false;
+  }
 
   List<DataColumn> getColumns(List<String> columns) => columns
       .map((String column) => DataColumn(
@@ -109,7 +148,6 @@ class _AtividadeViewState extends State<AtividadeView> {
   List<DataRow> getRows(List<Sessao> sessao) => sessao.map((Sessao sessao) {
         final cells = [
           Text(_formataHHmmss(sessao.tempoAtivo)),
-          Text(_formataHHmmss(sessao.tempoPausa)),
           Text(_formatarData(sessao.inicio)),
         ];
 
@@ -145,6 +183,8 @@ class _AtividadeViewState extends State<AtividadeView> {
   void _getSessoes(String id) async {
     SharedPreferences storedData = await SharedPreferences.getInstance();
     List<String>? decoded = storedData.getStringList(id);
+    String intId = id + "1";
+    totalInt = storedData.getInt(intId) ?? 0;
     sssList = decoded == null
         ? []
         : decoded.map((item) => Sessao.fromJson(item)).toList();
@@ -153,8 +193,8 @@ class _AtividadeViewState extends State<AtividadeView> {
   }
 
   String _formatarData(DateTime inicio) {
-    String dia = inicio.day.toString();
-    String mes = inicio.month.toString();
+    String dia = inicio.day.toString().padLeft(2, "0");
+    String mes = inicio.month.toString().padLeft(2, "0");
     String ano = inicio.year.toString();
     return '$dia\/$mes\/$ano';
   }
@@ -165,6 +205,16 @@ class _AtividadeViewState extends State<AtividadeView> {
     String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
     String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
     return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
+  }
+
+  _formataHm(int segundos) {
+    Duration duration = Duration(seconds: segundos);
+    String Minutes = duration.inMinutes.remainder(60).toString();
+    if (duration.inHours == 0) {
+      return "${Minutes}m";
+    }
+    ;
+    return "${duration.inHours}h ${Minutes}m";
   }
 }
 
@@ -198,7 +248,9 @@ editaAtividadeDialog(BuildContext context, Atividade atividade) => showDialog(
         Colors.grey,
         Colors.blueGrey,
       ];
-      Color cor = colorList[Random().nextInt(colorList.length)];
+      Color cor =
+          atividade.cor ?? colorList[Random().nextInt(colorList.length)];
+
       return Dialog(
         elevation: 10,
         insetPadding: EdgeInsets.symmetric(horizontal: test),
@@ -216,14 +268,14 @@ editaAtividadeDialog(BuildContext context, Atividade atividade) => showDialog(
                 const SizedBox(height: 16),
                 TextFormField(
                   autofocus: true,
-                  validator: (value) {
-                    if (value!.isEmpty || value == null) {
-                      return 'adicione um nome';
-                    }
-                  },
+                  // validator: (value) {
+                  //   if (value!.isEmpty || value == null) {
+                  //     return 'adicione um nome';
+                  //   }
+                  // },
                   decoration: InputDecoration(hintText: "${atividade.nome}"),
                   onSaved: (value) {
-                    nomeAtv = value;
+                    nomeAtv = value == '' ? atividade.nome : value;
                   },
                 ),
                 const SizedBox(height: 25),
@@ -265,7 +317,12 @@ editaAtividadeDialog(BuildContext context, Atividade atividade) => showDialog(
                     ),
                     ElevatedButton(
                       child: const Text('Excluir'),
-                      onPressed: () => _Delete(context, atividade),
+                      onPressed: () {
+                        //FocusScope.of(context).unfocus();
+                        //print(FocusManager.instance.toString());
+                        Navigator.pop(context);
+                        deletaAtividadeDialog(context, atividade);
+                      },
                     ),
                   ],
                 ),
@@ -289,7 +346,13 @@ _Delete(BuildContext context, Atividade atividade) {
   Provider.of<SessaoAtividadeProvider>(context, listen: false)
       .excluirAtividade(atividade);
   _saveAtvs(context);
-  Navigator.pop(context, true);
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(
+      builder: (BuildContext context) => HomeView(reload: false),
+    ),
+    (route) => false,
+  );
 }
 
 _saveAtvs(BuildContext context) async {
@@ -303,3 +366,37 @@ _saveAtvs(BuildContext context) async {
   //print('string $strAtvList');
   await storedData.setStringList('listaAtividades', strAtvList);
 }
+
+deletaAtividadeDialog(BuildContext context, Atividade atividade) => showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (BuildContext context) {
+      return Dialog(
+          elevation: 10,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 10),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(11),
+          ),
+          child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Confirma exclusão?'),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  ElevatedButton(
+                    child: const Text('Sim'),
+                    onPressed: () => _Delete(context, atividade),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  ElevatedButton(
+                    child: const Text('Não'),
+                    onPressed: () => Navigator.pop(context),
+                  )
+                ],
+              )));
+    });
